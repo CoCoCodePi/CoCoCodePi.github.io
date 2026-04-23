@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Candidatos | Manserca</title>
+    <!-- Para cambiar a la versión sobria, cambia "style.css" por "style-sober.css" abajo -->
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fjalla+One&display=swap" rel="stylesheet">
 </head>
@@ -24,6 +25,11 @@
         </div>
 
         <form id="atsForm">
+            <!-- SEGURIDAD: Campo invisible para humanos, trampa para bots -->
+            <div style="display:none !important;">
+                <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
+            </div>
+
             <!-- PASO 1: Datos Personales -->
             <section id="step1" class="form-section active">
                 <h2>1. Datos Personales</h2>

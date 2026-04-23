@@ -28,12 +28,18 @@ const venezuelaData = {
 let currentStep = 1;
 let selectedOptions = {};
 
+// MÁSCARA DE TELÉFONO (0412 000 00 00)
+document.getElementById('telefono').addEventListener('input', function (e) {
+    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,4})(\d{0,3})(\d{0,2})(\d{0,2})/);
+    e.target.value = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+});
+
 function nextStep(step) {
     if (step > currentStep) {
         const inputs = document.querySelectorAll(`#step${currentStep} [required]`);
         let valid = true;
         inputs.forEach(input => {
-            if (!input.value) {
+            if (!input.value || (input.type === "email" && !input.value.includes('@'))) {
                 input.style.borderColor = "#e53e3e";
                 valid = false;
             } else {
@@ -52,115 +58,45 @@ function nextStep(step) {
     });
 
     currentStep = step;
-    window.scrollTo(0,0);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll suave al subir
 }
 
-// CARGA DE MUNICIPIOS EN CASCADA
-function loadMunicipalities() {
-    const estado = document.getElementById('estado').value;
-    const muniSelect = document.getElementById('municipio');
-    muniSelect.innerHTML = '<option value="">Seleccione Municipio...</option>';
-    
-    if (venezuelaData[estado]) {
-        venezuelaData[estado].forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            opt.textContent = m;
-            muniSelect.appendChild(opt);
-        });
-    }
-}
-
-function loadDynamicQuestions() {
-    const perfil = document.getElementById('perfil').value;
-    const container = document.getElementById('dynamicQuestionsContainer');
-    container.innerHTML = '';
-
-    const questions = questionBank.filter(q => 
-        q.aplicaA.includes("Todos") || q.aplicaA.includes(perfil)
-    );
-
-    if (questions.length === 0) {
-        container.innerHTML = '<p class="empty-msg">No hay preguntas adicionales para este cargo.</p>';
-        return;
-    }
-
-    questions.forEach(q => {
-        const card = document.createElement('div');
-        card.className = 'q-card';
-        card.innerHTML = `<h3>${q.pregunta}</h3>`;
-
-        const optionsGrid = document.createElement('div');
-        optionsGrid.className = 'options-grid';
-
-        q.opciones.forEach(opt => {
-            const pill = document.createElement('div');
-            pill.className = 'option-pill';
-            pill.textContent = opt;
-            pill.onclick = () => toggleOption(q.id, opt, q.tipo, pill);
-            optionsGrid.appendChild(pill);
-        });
-
-        card.appendChild(optionsGrid);
-        container.appendChild(card);
-    });
-}
-
-function toggleOption(qId, val, type, el) {
-    if (type === 'Si/No') {
-        const siblings = el.parentElement.querySelectorAll('.option-pill');
-        siblings.forEach(s => s.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedOptions[qId] = val;
-    } else {
-        if (!selectedOptions[qId]) selectedOptions[qId] = [];
-        
-        if (val === "Todas las anteriores") {
-            const siblings = el.parentElement.querySelectorAll('.option-pill');
-            if (el.classList.contains('selected')) {
-                el.classList.remove('selected');
-                selectedOptions[qId] = [];
-            } else {
-                siblings.forEach(s => s.classList.remove('selected'));
-                el.classList.add('selected');
-                selectedOptions[qId] = ["Todas las anteriores"];
-            }
-        } else {
-            const allBtn = Array.from(el.parentElement.querySelectorAll('.option-pill')).find(p => p.textContent === "Todas las anteriores");
-            if (allBtn) {
-                allBtn.classList.remove('selected');
-                selectedOptions[qId] = selectedOptions[qId].filter(v => v !== "Todas las anteriores");
-            }
-
-            if (el.classList.contains('selected')) {
-                el.classList.remove('selected');
-                selectedOptions[qId] = selectedOptions[qId].filter(v => v !== val);
-            } else {
-                el.classList.add('selected');
-                selectedOptions[qId].push(val);
-            }
-        }
-    }
-}
+// ... (resto de funciones de carga de municipios y preguntas igual) ...
 
 document.getElementById('atsForm').onsubmit = async (e) => {
     e.preventDefault();
+
+    // SEGURIDAD: Honeypot
+    if (document.getElementById('website_url').value !== "") {
+        console.log("Bot detectado.");
+        return;
+    }
+
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="loader"></span> Enviando...';
+    btn.innerHTML = 'Enviando...';
 
+    // SANITIZACIÓN BÁSICA
     const payload = {
-        nombre: document.getElementById('nombre').value,
-        cedula: document.getElementById('nacionalidad').value + "-" + document.getElementById('cedula').value,
-        correo: document.getElementById('correo').value,
-        telefono: document.getElementById('telefono').value,
+        nombre: document.getElementById('nombre').value.trim(),
+        cedula: document.getElementById('nacionalidad').value + "-" + document.getElementById('cedula').value.trim(),
+        correo: document.getElementById('correo').value.toLowerCase().trim(),
+        telefono: document.getElementById('telefono').value.trim(),
         perfil: document.getElementById('perfil').value,
         estado: document.getElementById('estado').value,
         municipio: document.getElementById('municipio').value,
-        sector: document.getElementById('sector').value,
+        sector: document.getElementById('sector').value.trim(),
         respuestas: selectedOptions,
         timestamp: new Date().toISOString()
     };
+
+    try {
+        const response = await fetch('URL_DE_TU_FLUJO_HTTP_AQUI', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        // ... (resto de lógica de éxito igual) ...
 
     try {
         const response = await fetch('URL_DE_TU_FLUJO_HTTP_AQUI', {
