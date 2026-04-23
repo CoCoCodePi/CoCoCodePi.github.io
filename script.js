@@ -76,7 +76,15 @@ document.getElementById('atsForm').onsubmit = async (e) => {
     btn.disabled = true;
     btn.innerHTML = 'Enviando...';
 
-    // SANITIZACIÓN BÁSICA
+    // CONVERTIR OBJETO DE RESPUESTAS A ARRAY DINÁMICO PARA POWER AUTOMATE
+    const respuestasArray = Object.keys(selectedOptions).map(id => {
+        const val = selectedOptions[id];
+        return {
+            id: id,
+            valor: Array.isArray(val) ? val.join(", ") : val.toString()
+        };
+    });
+
     const payload = {
         nombre: document.getElementById('nombre').value.trim(),
         cedula: document.getElementById('nacionalidad').value + "-" + document.getElementById('cedula').value.trim(),
@@ -86,7 +94,7 @@ document.getElementById('atsForm').onsubmit = async (e) => {
         estado: document.getElementById('estado').value,
         municipio: document.getElementById('municipio').value,
         sector: document.getElementById('sector').value.trim(),
-        respuestas: selectedOptions,
+        respuestas: respuestasArray,
         timestamp: new Date().toISOString()
     };
 
