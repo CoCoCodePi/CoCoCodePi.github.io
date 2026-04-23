@@ -6,14 +6,13 @@
     <title>Portal de Candidatos | Manserca</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
     <div class="glass-container">
         <header>
             <div class="logo">MANSERCA</div>
             <h1>Únete a nuestro equipo</h1>
-            <p>Tu futuro profesional comienza aquí</p>
+            <p>Formulario de postulación oficial</p>
         </header>
 
         <div class="stepper">
@@ -27,44 +26,46 @@
         <form id="atsForm">
             <!-- PASO 1: Datos Personales -->
             <section id="step1" class="form-section active">
-                <h2>Datos Personales</h2>
+                <h2>1. Datos Personales</h2>
                 <div class="input-grid">
                     <div class="input-group">
                         <label>Nombre Completo</label>
-                        <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+                        <input type="text" id="nombre" placeholder="Nombre y Apellido" required>
                     </div>
                     <div class="input-group">
                         <label>Cédula</label>
-                        <div class="cedula-row">
-                            <select id="nacionalidad">
+                        <div class="cedula-row" style="display: flex; gap: 10px;">
+                            <select id="nacionalidad" style="width: 80px;">
                                 <option value="V">V</option>
                                 <option value="E">E</option>
                             </select>
-                            <input type="number" id="cedula" placeholder="12345678" required>
+                            <input type="number" id="cedula" placeholder="Número de cédula" required style="flex: 1;">
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Correo Electrónico</label>
-                        <input type="email" id="correo" placeholder="juan@ejemplo.com" required>
+                        <input type="email" id="correo" placeholder="correo@ejemplo.com" required>
                     </div>
                     <div class="input-group">
-                        <label>Teléfono</label>
-                        <input type="tel" id="telefono" placeholder="+58 412..." required>
+                        <label>Teléfono de contacto</label>
+                        <input type="tel" id="telefono" placeholder="+58 412 000 0000" required>
                     </div>
                 </div>
-                <button type="button" class="btn-next" onclick="nextStep(2)">Siguiente</button>
+                <div class="btn-row">
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Siguiente</button>
+                </div>
             </section>
 
             <!-- PASO 2: Ubicación y Cargo -->
             <section id="step2" class="form-section">
-                <h2>Ubicación y Cargo</h2>
+                <h2>2. Perfil y Ubicación</h2>
                 <div class="input-grid">
                     <div class="input-group">
                         <label>Cargo al que aplica</label>
                         <select id="perfil" onchange="loadDynamicQuestions()" required>
                             <option value="">Seleccione un cargo...</option>
                             <option value="Operario de Limpieza">Operario de Limpieza</option>
-                            <option value="Chofer">Chofer</option>
+                            <option value="Chófer">Chófer</option>
                             <option value="Jardinero">Jardinero</option>
                             <option value="Técnico de Limpieza">Técnico de Limpieza</option>
                             <option value="Supervisor de Operaciones">Supervisor de Operaciones</option>
@@ -72,15 +73,43 @@
                     </div>
                     <div class="input-group">
                         <label>Estado</label>
-                        <input type="text" id="estado" placeholder="Ej: Carabobo" required>
+                        <select id="estado" onchange="loadMunicipalities()" required>
+                            <option value="">Seleccione Estado...</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Anzoátegui">Anzoátegui</option>
+                            <option value="Apure">Apure</option>
+                            <option value="Aragua">Aragua</option>
+                            <option value="Barinas">Barinas</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Carabobo">Carabobo</option>
+                            <option value="Cojedes">Cojedes</option>
+                            <option value="Delta Amacuro">Delta Amacuro</option>
+                            <option value="Distrito Capital">Distrito Capital</option>
+                            <option value="Falcón">Falcón</option>
+                            <option value="Guárico">Guárico</option>
+                            <option value="Lara">Lara</option>
+                            <option value="Mérida">Mérida</option>
+                            <option value="Miranda">Miranda</option>
+                            <option value="Monagas">Monagas</option>
+                            <option value="Nueva Esparta">Nueva Esparta</option>
+                            <option value="Portuguesa">Portuguesa</option>
+                            <option value="Sucre">Sucre</option>
+                            <option value="Táchira">Táchira</option>
+                            <option value="Trujillo">Trujillo</option>
+                            <option value="Vargas (La Guaira)">Vargas (La Guaira)</option>
+                            <option value="Yaracuy">Yaracuy</option>
+                            <option value="Zulia">Zulia</option>
+                        </select>
                     </div>
                     <div class="input-group">
                         <label>Municipio</label>
-                        <input type="text" id="municipio" placeholder="Ej: Valencia" required>
+                        <select id="municipio" required>
+                            <option value="">Seleccione Municipio...</option>
+                        </select>
                     </div>
                     <div class="input-group">
-                        <label>Sector / Urbanización</label>
-                        <input type="text" id="sector" placeholder="Ej: Prebo" required>
+                        <label>Sector / Referencia</label>
+                        <input type="text" id="sector" placeholder="Ej: Urbanización Prebo" required>
                     </div>
                 </div>
                 <div class="btn-row">
@@ -91,9 +120,9 @@
 
             <!-- PASO 3: Preguntas Técnicas -->
             <section id="step3" class="form-section">
-                <h2>Preguntas de Perfil</h2>
+                <h2>3. Preguntas de Aptitud</h2>
                 <div id="dynamicQuestionsContainer">
-                    <p class="empty-msg">Seleccione un cargo en el paso anterior para ver las preguntas.</p>
+                    <!-- Las preguntas se cargan aquí -->
                 </div>
                 <div class="btn-row">
                     <button type="button" class="btn-back" onclick="nextStep(2)">Atrás</button>
@@ -101,13 +130,6 @@
                 </div>
             </section>
         </form>
-
-        <div id="successMessage" class="hidden">
-            <div class="success-icon">✓</div>
-            <h2>¡Postulación Recibida!</h2>
-            <p>Hemos recibido tus datos correctamente. Nuestro equipo de RRHH revisará tu perfil pronto.</p>
-            <button onclick="location.reload()">Cerrar</button>
-        </div>
     </div>
     <script src="preguntas.js"></script>
     <script src="script.js"></script>

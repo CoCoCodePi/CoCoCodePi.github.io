@@ -16,12 +16,20 @@ const questionBank = [
         aplicaA: ["Todos"]
     },
     {
+        id: "Chofer_Licencia",
+        pregunta: "¿Qué grado de licencia de conducir posee?",
+        tipo: "Opcion_Multiple",
+        opciones: ["3er Grado", "4to Grado", "5to Grado"],
+        puntos: [10, 20, 30],
+        aplicaA: ["Chófer"]
+    },
+    {
         id: "Chofer_Vehiculos",
         pregunta: "¿Qué tipo de vehículos sabe conducir?",
         tipo: "Opcion_Multiple",
-        opciones: ["Moto", "Carro", "Camionetas", "Todas las anteriores"],
-        puntos: [10, 15, 20, 45],
-        aplicaA: ["Chofer"]
+        opciones: ["Moto", "Carro", "Camionetas", "Camiones", "Todas las anteriores"],
+        puntos: [5, 10, 15, 20, 50],
+        aplicaA: ["Chófer"]
     },
     {
         id: "OpLimp_Lugares",
@@ -31,5 +39,4 @@ const questionBank = [
         puntos: [10, 10, 10, 30],
         aplicaA: ["Operario de Limpieza"]
     }
-    // ... más preguntas se cargarán aquí automáticamente vía Power Automate
 ];
