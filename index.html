@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Candidatos | Manserca</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <div class="glass-container">
+        <header>
+            <div class="logo">MANSERCA</div>
+            <h1>Únete a nuestro equipo</h1>
+            <p>Tu futuro profesional comienza aquí</p>
+        </header>
+
+        <div class="stepper">
+            <div class="step active" id="s1">1</div>
+            <div class="step-line"></div>
+            <div class="step" id="s2">2</div>
+            <div class="step-line"></div>
+            <div class="step" id="s3">3</div>
+        </div>
+
+        <form id="atsForm">
+            <!-- PASO 1: Datos Personales -->
+            <section id="step1" class="form-section active">
+                <h2>Datos Personales</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Cédula</label>
+                        <div class="cedula-row">
+                            <select id="nacionalidad">
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                            </select>
+                            <input type="number" id="cedula" placeholder="12345678" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="correo" placeholder="juan@ejemplo.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="telefono" placeholder="+58 412..." required>
+                    </div>
+                </div>
+                <button type="button" class="btn-next" onclick="nextStep(2)">Siguiente</button>
+            </section>
+
+            <!-- PASO 2: Ubicación y Cargo -->
+            <section id="step2" class="form-section">
+                <h2>Ubicación y Cargo</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Cargo al que aplica</label>
+                        <select id="perfil" onchange="loadDynamicQuestions()" required>
+                            <option value="">Seleccione un cargo...</option>
+                            <option value="Operario de Limpieza">Operario de Limpieza</option>
+                            <option value="Chofer">Chofer</option>
+                            <option value="Jardinero">Jardinero</option>
+                            <option value="Técnico de Limpieza">Técnico de Limpieza</option>
+                            <option value="Supervisor de Operaciones">Supervisor de Operaciones</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Estado</label>
+                        <input type="text" id="estado" placeholder="Ej: Carabobo" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Municipio</label>
+                        <input type="text" id="municipio" placeholder="Ej: Valencia" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Sector / Urbanización</label>
+                        <input type="text" id="sector" placeholder="Ej: Prebo" required>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button type="button" class="btn-back" onclick="nextStep(1)">Atrás</button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)">Siguiente</button>
+                </div>
+            </section>
+
+            <!-- PASO 3: Preguntas Técnicas -->
+            <section id="step3" class="form-section">
+                <h2>Preguntas de Perfil</h2>
+                <div id="dynamicQuestionsContainer">
+                    <p class="empty-msg">Seleccione un cargo en el paso anterior para ver las preguntas.</p>
+                </div>
+                <div class="btn-row">
+                    <button type="button" class="btn-back" onclick="nextStep(2)">Atrás</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Enviar Postulación</button>
+                </div>
+            </section>
+        </form>
+
+        <div id="successMessage" class="hidden">
+            <div class="success-icon">✓</div>
+            <h2>¡Postulación Recibida!</h2>
+            <p>Hemos recibido tus datos correctamente. Nuestro equipo de RRHH revisará tu perfil pronto.</p>
+            <button onclick="location.reload()">Cerrar</button>
+        </div>
+    </div>
+    <script src="preguntas.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
