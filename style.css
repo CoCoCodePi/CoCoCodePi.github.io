@@ -1,12 +1,10 @@
 :root {
-    --manserca-blue: #0056b3; /* Azul corporativo Manserca */
-    --manserca-teal: #00bfa5;
-    --bg-dark: #1a202c;
-    --glass: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text-main: #ffffff;
-    --text-dim: #cbd5e0;
-    --input-bg: #2d3748;
+    --manserca-blue: #0022AA;
+    --manserca-lime: #D9FF00;
+    --manserca-dark: #111111;
+    --manserca-white: #FFFFFF;
+    --font-main: 'Poppins', sans-serif;
+    --font-bold: 'Fjalla One', sans-serif;
 }
 
 * {
@@ -16,9 +14,9 @@
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
-    background: #0f172a;
-    color: var(--text-main);
+    font-family: var(--font-main);
+    background-color: #f0f2f5; /* Fondo neutro para resaltar la caja lima */
+    color: var(--manserca-dark);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -27,32 +25,44 @@ body {
 }
 
 .glass-container {
-    background: #1e293b;
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 50px;
+    background-color: var(--manserca-lime);
+    padding: 60px;
+    border-radius: 40px;
     width: 100%;
     max-width: 900px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    text-align: center;
 }
 
 header {
-    text-align: center;
     margin-bottom: 50px;
 }
 
 .logo {
-    font-weight: 800;
-    font-size: 1.8rem;
-    color: var(--manserca-teal);
-    letter-spacing: 3px;
+    font-family: var(--font-bold);
+    font-size: 2rem;
+    color: var(--manserca-blue);
+    letter-spacing: 2px;
     margin-bottom: 10px;
     text-transform: uppercase;
 }
 
-h1 { font-size: 2.5rem; margin-bottom: 10px; }
+h1 { 
+    font-family: var(--font-bold);
+    color: var(--manserca-blue);
+    font-size: 3rem; 
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    line-height: 1;
+}
 
-/* STEPPER (Opcional, se oculta si es One Page) */
+p {
+    color: var(--manserca-blue);
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+/* STEPPER */
 .stepper {
     display: flex;
     align-items: center;
@@ -61,136 +71,168 @@ h1 { font-size: 2.5rem; margin-bottom: 10px; }
 }
 
 .step {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    background: var(--input-bg);
-    border: 2px solid var(--glass-border);
+    background: var(--manserca-white);
+    border: 3px solid var(--manserca-blue);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-weight: 800;
+    color: var(--manserca-blue);
 }
 
 .step.active {
     background: var(--manserca-blue);
-    border-color: var(--manserca-blue);
+    color: var(--manserca-lime);
 }
 
-/* FORMULARIOS */
+.step-line {
+    width: 40px;
+    height: 3px;
+    background: var(--manserca-blue);
+    margin: 0 5px;
+}
+
+/* FORM SECTIONS */
 .form-section {
-    display: none; /* Se activa por JS o se pone block para One Page */
-    margin-bottom: 40px;
+    display: none;
+    text-align: left;
 }
 
 .form-section.active {
     display: block;
 }
 
-/* MODO ONE PAGE: Descomenta esto para ver todo junto */
-/* .form-section { display: block !important; } .stepper { display: none !important; } .btn-next, .btn-back { display: none !important; } */
-
 h2 { 
+    font-family: var(--font-bold);
     margin-bottom: 30px; 
-    font-size: 1.6rem; 
-    color: var(--manserca-teal);
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 10px;
+    font-size: 2rem; 
+    color: var(--manserca-blue);
+    text-transform: uppercase;
+    border-bottom: 3px solid var(--manserca-blue);
+    display: inline-block;
+    padding-bottom: 5px;
 }
 
 .input-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    gap: 25px;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
-label { font-size: 0.95rem; font-weight: 500; color: var(--text-dim); }
+label { 
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    color: var(--manserca-blue);
+    text-transform: uppercase;
+}
 
 input, select, textarea {
-    background: var(--input-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    padding: 14px;
-    color: #ffffff !important; /* Forzar letra blanca */
+    background: var(--manserca-white);
+    border: 2px solid transparent;
+    border-radius: 15px;
+    padding: 16px;
+    color: var(--manserca-blue);
     font-size: 1rem;
-}
-
-/* FIX DROPDOWNS: Fondo oscuro para las opciones */
-select option {
-    background-color: #1e293b;
-    color: white;
+    font-weight: 500;
+    transition: 0.3s;
 }
 
 input:focus, select:focus {
     outline: none;
-    border-color: var(--manserca-teal);
+    border-color: var(--manserca-blue);
+    box-shadow: 0 0 15px rgba(0,34,170,0.1);
 }
 
+/* BOTONES ESTILO MANSERCA */
 .btn-row { 
     display: flex; 
-    justify-content: flex-end; 
+    justify-content: space-between; 
     gap: 20px;
-    margin-top: 40px; 
-    padding-top: 20px;
+    margin-top: 50px; 
 }
 
 button {
     cursor: pointer;
-    border-radius: 8px;
-    padding: 15px 40px;
-    font-weight: 700;
-    font-size: 1.1rem;
+    background-color: var(--manserca-dark);
+    color: var(--manserca-white);
+    padding: 18px 45px;
+    border-radius: 50px; /* Bordes muy redondeados */
+    font-family: var(--font-main);
+    font-weight: 800;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
     transition: 0.3s;
 }
 
 .btn-next, .btn-submit {
-    background: var(--manserca-blue);
-    color: white;
-    border: none;
+    margin-left: auto;
 }
 
 .btn-back {
     background: transparent;
-    color: var(--text-dim);
-    border: 1px solid var(--glass-border);
+    color: var(--manserca-blue);
+    border: 2px solid var(--manserca-blue);
 }
 
 button:hover {
-    filter: brightness(1.2);
-    transform: scale(1.02);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 /* CARDS DE PREGUNTAS */
 .q-card {
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.q-card h3 {
+    color: var(--manserca-blue);
+    margin-bottom: 15px;
 }
 
 .options-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 20px;
 }
 
 .option-pill {
-    padding: 10px 20px;
-    background: var(--input-bg);
-    border: 1px solid var(--glass-border);
+    padding: 12px 24px;
+    background: var(--manserca-white);
+    border: 2px solid transparent;
     border-radius: 30px;
     cursor: pointer;
+    font-weight: 600;
+    color: var(--manserca-blue);
+    transition: 0.3s;
 }
 
 .option-pill.selected {
-    background: var(--manserca-teal);
-    color: #000;
-    font-weight: 700;
+    background: var(--manserca-blue);
+    color: var(--manserca-lime);
+}
+
+.empty-msg { color: var(--manserca-blue); font-weight: 600; }
+
+/* Mensaje de éxito */
+#successMessage {
+    text-align: center;
+    color: var(--manserca-blue);
+}
+.success-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
 }
