@@ -27,11 +27,108 @@ const venezuelaData = {
 
 let currentStep = 1;
 let selectedOptions = {};
+let selectedOptionsWithPoints = {};
 
-// MÁSCARA DE TELÉFONO (0412 000 00 00)
+// MANEJADOR DE ARCHIVO CV
+document.getElementById('cv').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    const label = document.getElementById('cvFileName');
+    if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+            alert('El archivo excede el límite de 10MB.');
+            e.target.value = '';
+            label.textContent = 'Arrastra tu CV aquí o haz clic para seleccionar';
+            return;
+        }
+        label.textContent = `✓ ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+    } else {
+        label.textContent = 'Arrastra tu CV aquí o haz clic para seleccionar';
+    }
+});
+
+// INICIALIZACIÓN DE DESPLEGABLES DE FECHA DE NACIMIENTO (Día 1-31, Año 1950-2008)
+function initDobSelectors() {
+    const diaSelect = document.getElementById('dob_dia');
+    const anioSelect = document.getElementById('dob_anio');
+    if (!diaSelect || !anioSelect) return;
+
+    diaSelect.innerHTML = '<option value="">Día</option>';
+    for (let i = 1; i <= 31; i++) {
+        const val = String(i).padStart(2, '0');
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = i;
+        diaSelect.appendChild(opt);
+    }
+
+    anioSelect.innerHTML = '<option value="">Año</option>';
+    const currentYear = new Date().getFullYear();
+    const maxYear = currentYear - 18; // Máximo 2008 (mayor de edad)
+    const minYear = 1950;
+
+    for (let y = maxYear; y >= minYear; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        anioSelect.appendChild(opt);
+    }
+}
+
+function updateDaysInMonth() {
+    const mes = document.getElementById('dob_mes').value;
+    const anio = document.getElementById('dob_anio').value || new Date().getFullYear();
+    const diaSelect = document.getElementById('dob_dia');
+    if (!diaSelect) return;
+
+    const currentSelectedDay = diaSelect.value;
+
+    // Calcular días exactos del mes (28, 29, 30 o 31)
+    let maxDays = 31;
+    if (mes) {
+        maxDays = new Date(parseInt(anio, 10), parseInt(mes, 10), 0).getDate();
+    }
+
+    diaSelect.innerHTML = '<option value="">Día</option>';
+    for (let i = 1; i <= maxDays; i++) {
+        const val = String(i).padStart(2, '0');
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = i;
+        if (val === currentSelectedDay && parseInt(currentSelectedDay, 10) <= maxDays) {
+            opt.selected = true;
+        }
+        diaSelect.appendChild(opt);
+    }
+
+    updateDobHidden();
+}
+
+function updateDobHidden() {
+    const dia = document.getElementById('dob_dia').value;
+    const mes = document.getElementById('dob_mes').value;
+    const anio = document.getElementById('dob_anio').value;
+    const hiddenInput = document.getElementById('fecha_nacimiento');
+
+    if (dia && mes && anio) {
+        hiddenInput.value = `${anio}-${mes}-${dia}`;
+    } else {
+        hiddenInput.value = '';
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDobSelectors);
+} else {
+    initDobSelectors();
+}
+
+// MÁSCARA DE TELÉFONOS
 document.getElementById('telefono').addEventListener('input', function (e) {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,4})(\d{0,3})(\d{0,2})(\d{0,2})/);
-    e.target.value = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+});
+
+document.getElementById('telefono2').addEventListener('input', function (e) {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
 });
 
 function nextStep(step) {
@@ -51,22 +148,183 @@ function nextStep(step) {
 
     document.getElementById(`step${currentStep}`).classList.remove('active');
     document.getElementById(`step${step}`).classList.add('active');
-    
+
     document.querySelectorAll('.step').forEach((s, idx) => {
         if (idx < step) s.classList.add('active');
         else s.classList.remove('active');
     });
 
     currentStep = step;
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll suave al subir
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ... (resto de funciones de carga de municipios y preguntas igual) ...
+function loadMunicipalities() {
+    const estado = document.getElementById('estado').value;
+    const municipioSelect = document.getElementById('municipio');
+    municipioSelect.innerHTML = '<option value="">Seleccione Municipio...</option>';
+
+    if (estado && venezuelaData[estado]) {
+        venezuelaData[estado].forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            municipioSelect.appendChild(opt);
+        });
+    }
+}
+
+// COMPROBACIÓN DE DEPENDENCIAS DINÁMICAS (Ej: Licencia Chófer)
+function checkDependencies() {
+    const perfil = document.getElementById('perfil').value;
+    if (perfil === 'Chófer') {
+        const docSelection = selectedOptions["Chofer_Documentacion"] || [];
+        const tieneLicencia = docSelection.includes("Licencia de Conducir") || docSelection.includes("Todas las anteriores");
+
+        const gradoCard = document.getElementById("card_Chofer_Licencia_Grado");
+        if (gradoCard) {
+            if (!tieneLicencia) {
+                gradoCard.classList.add("disabled-card");
+                gradoCard.querySelectorAll(".option-pill").forEach(p => p.classList.remove("selected"));
+                selectedOptions["Chofer_Licencia_Grado"] = "No Aplica (Sin Licencia)";
+                selectedOptionsWithPoints["Chofer_Licencia_Grado"] = [{ texto: "No Aplica", puntos: 0 }];
+            } else {
+                gradoCard.classList.remove("disabled-card");
+                if (selectedOptions["Chofer_Licencia_Grado"] === "No Aplica (Sin Licencia)") {
+                    delete selectedOptions["Chofer_Licencia_Grado"];
+                    delete selectedOptionsWithPoints["Chofer_Licencia_Grado"];
+                }
+            }
+        }
+    }
+}
+
+function loadDynamicQuestions() {
+    const perfil = document.getElementById('perfil').value;
+    const container = document.getElementById('dynamicQuestionsContainer');
+    container.innerHTML = '';
+    selectedOptions = {};
+    selectedOptionsWithPoints = {};
+
+    if (!perfil) {
+        container.innerHTML = '<p class="empty-msg">Seleccione un cargo para ver las preguntas.</p>';
+        return;
+    }
+
+    const preguntas = questionBank.filter(q =>
+        q.aplicaA.includes('Todos') || q.aplicaA.includes(perfil)
+    );
+
+    if (preguntas.length === 0) {
+        container.innerHTML = '<p class="empty-msg">No hay preguntas para este cargo.</p>';
+        return;
+    }
+
+    preguntas.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'q-card';
+        card.id = `card_${q.id}`;
+        card.innerHTML = `<h3>${q.pregunta}</h3><div class="options-grid" id="opts_${q.id}"></div>`;
+        container.appendChild(card);
+
+        const grid = card.querySelector('.options-grid');
+        q.opciones.forEach((opcionObj) => {
+            const opcionTexto = typeof opcionObj === 'string' ? opcionObj : opcionObj.texto;
+            const puntosVal = typeof opcionObj === 'string' ? 0 : opcionObj.puntos;
+
+            const pill = document.createElement('div');
+            pill.className = 'option-pill';
+            pill.textContent = opcionTexto;
+            const esTodas = /todas las anteriores/i.test(opcionTexto);
+
+            pill.onclick = () => {
+                if (card.classList.contains('disabled-card')) return;
+
+                const esUnica = (q.tipo === 'Si/No' || q.tipo === 'Seleccion_Unica');
+
+                if (esUnica) {
+                    grid.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
+                    pill.classList.add('selected');
+                    selectedOptions[q.id] = opcionTexto;
+                    selectedOptionsWithPoints[q.id] = [{ texto: opcionTexto, puntos: puntosVal }];
+                    checkDependencies();
+                    return;
+                }
+
+                // Selección múltiple
+                if (esTodas) {
+                    grid.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
+                    selectedOptions[q.id] = [];
+                    selectedOptionsWithPoints[q.id] = [];
+                    pill.classList.add('selected');
+                    selectedOptions[q.id] = [opcionTexto];
+                    selectedOptionsWithPoints[q.id] = [{ texto: opcionTexto, puntos: puntosVal }];
+                    checkDependencies();
+                    return;
+                }
+
+                grid.querySelectorAll('.option-pill').forEach(p => {
+                    if (/todas las anteriores/i.test(p.textContent)) p.classList.remove('selected');
+                });
+
+                if (!selectedOptions[q.id]) selectedOptions[q.id] = [];
+                if (!selectedOptionsWithPoints[q.id]) selectedOptionsWithPoints[q.id] = [];
+
+                selectedOptions[q.id] = selectedOptions[q.id].filter(v => !/todas las anteriores/i.test(v));
+                selectedOptionsWithPoints[q.id] = selectedOptionsWithPoints[q.id].filter(v => !/todas las anteriores/i.test(v.texto));
+
+                pill.classList.toggle('selected');
+                if (pill.classList.contains('selected')) {
+                    selectedOptions[q.id].push(opcionTexto);
+                    selectedOptionsWithPoints[q.id].push({ texto: opcionTexto, puntos: puntosVal });
+                } else {
+                    selectedOptions[q.id] = selectedOptions[q.id].filter(v => v !== opcionTexto);
+                    selectedOptionsWithPoints[q.id] = selectedOptionsWithPoints[q.id].filter(v => v.texto !== opcionTexto);
+                }
+                checkDependencies();
+            };
+            grid.appendChild(pill);
+        });
+    });
+
+    checkDependencies();
+}
+
+// GENERADOR INTELIGENTE DE RESUMEN_PERFIL PARA SHAREPOINT
+function buildResumenPerfil() {
+    let resumen = [];
+    const perfil = document.getElementById('perfil').value;
+    resumen.push(`Cargo: ${perfil}`);
+
+    questionBank.forEach(q => {
+        if (!q.aplicaA.includes('Todos') && !q.aplicaA.includes(perfil)) return;
+
+        let resp = selectedOptions[q.id];
+        if (!resp) return;
+
+        let textoLimpio = "";
+
+        if (Array.isArray(resp)) {
+            if (resp.some(r => /todas las anteriores/i.test(r))) {
+                const opcionesReales = q.opciones
+                    .map(o => typeof o === 'string' ? o : o.texto)
+                    .filter(t => !/todas las anteriores/i.test(t));
+                textoLimpio = opcionesReales.join(", ");
+            } else {
+                textoLimpio = resp.join(", ");
+            }
+        } else {
+            textoLimpio = resp;
+        }
+
+        resumen.push(`${q.pregunta}: ${textoLimpio}`);
+    });
+
+    return resumen.join(" | ");
+}
 
 document.getElementById('atsForm').onsubmit = async (e) => {
     e.preventDefault();
 
-    // SEGURIDAD: Honeypot
     if (document.getElementById('website_url').value !== "") {
         console.log("Bot detectado.");
         return;
@@ -76,38 +334,92 @@ document.getElementById('atsForm').onsubmit = async (e) => {
     btn.disabled = true;
     btn.innerHTML = 'Enviando...';
 
-    // CONVERTIR OBJETO DE RESPUESTAS A ARRAY DINÁMICO PARA POWER AUTOMATE
-    const respuestasArray = Object.keys(selectedOptions).map(id => {
+    const cvFile = document.getElementById('cv').files[0];
+    let cvContent = '';
+    let cvName = '';
+    let cvAdjunto = false;
+    let puntajeCV = 0;
+
+    if (cvFile) {
+        cvAdjunto = true;
+        puntajeCV = 20; // 20 Puntos por adjuntar CV en la escala de 200 pts
+        const nacPrefix = document.getElementById('nacionalidad').value;
+        const cedNum = document.getElementById('cedula').value.trim();
+        const ext = cvFile.name.split('.').pop();
+        cvName = `${nacPrefix}-${cedNum}.${ext}`;
+
+        cvContent = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result.split(',')[1]);
+            };
+            reader.readAsDataURL(cvFile);
+        });
+    }
+
+    const nacCode = document.getElementById('nacionalidad').value;
+    const nacionalidad = nacCode === 'V' ? 'Venezolano' : 'Extranjero';
+
+    // Construir respuestas_individuales desglosadas
+    const respuestasObj = {};
+    Object.keys(selectedOptions).forEach(id => {
         const val = selectedOptions[id];
-        return {
-            id: id,
-            valor: Array.isArray(val) ? val.join(", ") : val.toString()
-        };
+        respuestasObj[id] = Array.isArray(val) ? val.join(', ') : val;
     });
 
+    // CÁLCULO DE PUNTAJE TOTAL (ESCALA 200 PTS)
+    // Se separa "general" (Exp_Previa + Seguridad_Uniforme, aplican a Todos) de
+    // "técnico" (preguntas propias del cargo) para poder topar cada uno por
+    // separado: ningún cargo puede superar 140 pts técnicos ni 200 pts totales,
+    // sin importar cuántas opciones marque el candidato.
+    let puntajeGeneral = 0;
+    let acumuladoTecnico = 0;
+    Object.keys(selectedOptionsWithPoints).forEach(qId => {
+        const respArray = selectedOptionsWithPoints[qId];
+        if (!Array.isArray(respArray)) return;
+
+        const pregunta = questionBank.find(q => q.id === qId);
+        const esGeneral = pregunta && pregunta.aplicaA.includes('Todos');
+        const suma = respArray.reduce((acc, item) => acc + (item.puntos || 0), 0);
+
+        if (esGeneral) {
+            puntajeGeneral += suma;
+        } else {
+            acumuladoTecnico += suma;
+        }
+    });
+
+    const puntajeTecnico = Math.min(140, acumuladoTecnico);
+    const puntajeAptitud = Math.min(200, puntajeCV + puntajeGeneral + puntajeTecnico);
+
+    const resumenPerfilTexto = buildResumenPerfil();
+
     const payload = {
-        nombre: document.getElementById('nombre').value.trim(),
-        cedula: document.getElementById('nacionalidad').value + "-" + document.getElementById('cedula').value.trim(),
-        correo: document.getElementById('correo').value.toLowerCase().trim(),
-        telefono: document.getElementById('telefono').value.trim(),
-        perfil: document.getElementById('perfil').value,
-        estado: document.getElementById('estado').value,
-        municipio: document.getElementById('municipio').value,
-        sector: document.getElementById('sector').value.trim(),
-        respuestas: respuestasArray,
-        timestamp: new Date().toISOString()
+        Title: document.getElementById('nombre').value.trim(),
+        Cedula: nacCode + '-' + document.getElementById('cedula').value.trim(),
+        Correo: document.getElementById('correo').value.toLowerCase().trim(),
+        Telefono_1: document.getElementById('telefono').value.trim(),
+        Telefono_2: document.getElementById('telefono2').value.trim() || '',
+        Genero: document.getElementById('genero').value,
+        Fecha_Nacimiento: document.getElementById('fecha_nacimiento').value,
+        Nacionalidad: nacionalidad,
+        Pais: 'Venezuela',
+        Perfil: document.getElementById('perfil').value,
+        Estado: document.getElementById('estado').value,
+        Municipio: document.getElementById('municipio').value,
+        Sector: document.getElementById('sector').value.trim() || '',
+        Resumen_Perfil: resumenPerfilTexto,
+        Puntaje_Aptitud: puntajeAptitud,
+        Estatus_Seleccion: 'Nuevo',
+        cv_adjunto: cvAdjunto,
+        cv_content: cvContent,
+        cv_name: cvName,
+        respuestas_individuales: respuestasObj,
+        Fecha_Postulacion: new Date().toISOString()
     };
 
     try {
-        const response = await fetch('URL_DE_TU_FLUJO_HTTP_AQUI', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        // ... (resto de lógica de éxito igual) ...
-
-    try {
-        const response = await fetch('URL_DE_TU_FLUJO_HTTP_AQUI', {
+        const response = await fetch('https://defaultae02505ce3c04c73a2b6823b797744.8a.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/6093cbda00424c1ea6f632ea039f5ef3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_EK2nzCu6XS2gZoI9ne0-0K9gqP6vcZkV9yX4ujJ-nM', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -118,7 +430,7 @@ document.getElementById('atsForm').onsubmit = async (e) => {
                 <div id="successMessage">
                     <div class="success-icon">✓</div>
                     <h2>¡Postulación Exitosa!</h2>
-                    <p>Gracias ${payload.nombre}. Tu perfil ha sido registrado en nuestra base de datos.</p>
+                    <p>Gracias ${payload.Title}. Tu perfil ha sido registrado en nuestra base de datos con un puntaje de aptitud de ${puntajeAptitud}/200.</p>
                     <button class="btn-next" onclick="location.reload()">Volver</button>
                 </div>`;
         } else {
