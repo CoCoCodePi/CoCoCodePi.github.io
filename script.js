@@ -419,7 +419,7 @@ document.getElementById('atsForm').onsubmit = async (e) => {
     };
 
     try {
-        const response = await fetch('https://defaultae02505ce3c04c73a2b6823b797744.8a.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/6093cbda00424c1ea6f632ea039f5ef3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_EK2nzCu6XS2gZoI9ne0-0K9gqP6vcZkV9yX4ujJ-nM', {
+        const response = await fetch('https:defaultae02505ce3c04c73a2b6823b797744.8a.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/6093cbda00424c1ea6f632ea039f5ef3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_EK2nzCu6XS2gZoI9ne0-0K9gqP6vcZkV9yX4ujJ-nM', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
